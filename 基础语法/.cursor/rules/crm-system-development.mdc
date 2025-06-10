@@ -1,0 +1,275 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# CRM系统开发规则 (Customer Relationship Management System)
+
+## 项目基础说明
+
+- 本项目是一个现代化的CRM客户关系管理系统，基于 Vue 3 + TypeScript + Element Plus + Pinia + Vite 构建
+- 采用组合式 API（`<script setup lang="ts">`）进行开发，确保代码的现代化和可维护性
+- 状态管理使用 Pinia，按业务模块化组织（客户管理、销售机会、任务管理等）
+- 路由使用 Vue Router，采用基于角色的权限动态路由配置
+- 接口请求统一封装在 `@/utils/request.ts` 中，使用 Axios 进行HTTP通信
+- UI组件基于 Element Plus 封装通用业务组件，提高开发效率和一致性
+- 支持多租户架构，数据隔离和权限控制
+
+## 技术栈规范
+
+### 前端技术栈
+- **框架**: Vue 3.4+ (Composition API)
+- **语言**: TypeScript 5.0+
+- **构建工具**: Vite 5.0+
+- **UI框架**: Element Plus 2.4+
+- **状态管理**: Pinia 2.1+
+- **路由**: Vue Router 4.2+
+- **HTTP客户端**: Axios 1.6+
+- **样式**: UnoCSS + SCSS
+- **图表**: ECharts 5.4+
+- **表格**: Element Plus Table + 虚拟滚动
+- **表单验证**: Element Plus + 自定义验证规则
+
+### 后端技术栈（如涉及）
+- **框架**: Node.js + Express / Python + FastAPI
+- **数据库**: PostgreSQL / MySQL
+- **缓存**: Redis
+- **认证**: JWT + RBAC权限控制
+
+## CRM业务模块结构
+
+### 核心业务模块
+1. **客户管理 (Customer Management)**
+   - 客户信息管理、客户分类、客户标签
+   - 客户联系记录、客户跟进历史
+   
+2. **销售机会管理 (Opportunity Management)**
+   - 销售漏斗、机会阶段管理
+   - 销售预测、转化率分析
+   
+3. **联系人管理 (Contact Management)**
+   - 联系人信息、关系维护
+   - 沟通记录、互动历史
+   
+4. **任务与活动管理 (Task & Activity Management)**
+   - 任务分配、进度跟踪
+   - 日程安排、提醒通知
+   
+5. **报表与分析 (Reports & Analytics)**
+   - 销售报表、客户分析
+   - 数据可视化、KPI监控
+
+## 文件和组件命名规范
+
+### 组件命名
+- **页面组件**: 使用 `PascalCase` 格式，例如：`CustomerList.vue`, `OpportunityDetail.vue`
+- **业务组件**: 按模块前缀命名，例如：`CustomerCard.vue`, `SalesChart.vue`
+- **通用组件**: 放置在 `src/components/` 下，例如：`DataTable.vue`, `SearchForm.vue`
+- **布局组件**: 例如：`MainLayout.vue`, `SidebarLayout.vue`
+
+### 文件命名
+- **页面文件**: 使用 `kebab-case`，例如：`customer-list.vue`, `opportunity-detail.vue`
+- **API文件**: 按模块命名，例如：`customer-api.ts`, `opportunity-api.ts`
+- **Store文件**: 例如：`customer-store.ts`, `sales-store.ts`
+- **工具文件**: 例如：`date-utils.ts`, `format-utils.ts`
+
+### 目录结构规范
+```
+src/
+├── components/          # 通用组件
+│   ├── common/         # 基础组件
+│   ├── charts/         # 图表组件
+│   └── forms/          # 表单组件
+├── views/              # 页面组件
+│   ├── customer/       # 客户管理页面
+│   ├── opportunity/    # 销售机会页面
+│   ├── contact/        # 联系人页面
+│   ├── task/          # 任务管理页面
+│   └── dashboard/      # 仪表板页面
+├── stores/             # Pinia状态管理
+│   ├── customer.ts
+│   ├── opportunity.ts
+│   └── user.ts
+├── api/                # API接口
+│   ├── customer.ts
+│   ├── opportunity.ts
+│   └── common.ts
+├── utils/              # 工具函数
+├── types/              # TypeScript类型定义
+└── router/             # 路由配置
+```
+
+## CRM特定的编码规范
+
+### 数据模型规范
+- **客户实体**: 包含基本信息、联系方式、标签、状态等
+- **机会实体**: 包含金额、阶段、概率、预计成交时间等
+- **活动实体**: 包含类型、时间、参与人、结果等
+- **任务实体**: 包含标题、描述、优先级、截止时间、状态等
+
+### API接口规范
+- **RESTful设计**: 遵循REST规范，使用标准HTTP方法
+- **统一响应格式**: 
+```typescript
+interface ApiResponse<T> {
+  code: number;
+  message: string;
+  data: T;
+  timestamp: number;
+}
+```
+- **分页参数**: 统一使用 `page`, `pageSize`, `total` 格式
+- **筛选参数**: 支持多条件筛选，例如客户状态、创建时间范围等
+
+### 状态管理规范
+- **按业务模块拆分Store**: 客户Store、机会Store、任务Store等
+- **统一的加载状态**: 每个Store包含 `loading`, `error` 状态
+- **缓存策略**: 合理使用缓存，避免重复请求
+- **乐观更新**: 在适当场景使用乐观更新提升用户体验
+
+## 样式和UI规范
+
+### UnoCSS使用约定
+- **优先使用原子类**: 使用UnoCSS原子类进行布局，例如 `flex justify-between items-center`
+- **业务组合类**: 定义CRM特定的组合类
+```typescript
+// unocss.config.ts shortcuts
+shortcuts: {
+  'crm-card': 'bg-white rounded-lg shadow-sm border border-gray-200 p-6',
+  'crm-button-primary': 'bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md',
+  'crm-status-active': 'bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs',
+  'crm-status-inactive': 'bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs'
+}
+```
+
+### Element Plus定制
+- **主题色**: 使用企业品牌色作为主题色
+- **表格样式**: 统一表格样式，支持斑马纹、悬停效果
+- **表单样式**: 统一表单布局，标签宽度、间距等
+- **按钮样式**: 定义不同业务场景的按钮样式
+
+## CRM业务逻辑规范
+
+### 权限控制
+- **角色定义**: 管理员、销售经理、销售代表、客服等
+- **功能权限**: 查看、创建、编辑、删除、导出等
+- **数据权限**: 个人数据、团队数据、全部数据
+- **字段权限**: 敏感字段的查看和编辑权限
+
+### 数据验证
+- **客户信息验证**: 手机号、邮箱格式验证，重复客户检查
+- **机会金额验证**: 金额范围、货币格式验证
+- **时间验证**: 截止时间不能早于当前时间
+- **必填字段**: 明确标识必填字段，提供清晰的错误提示
+
+### 业务流程
+- **客户生命周期**: 潜在客户 → 意向客户 → 成交客户 → 流失客户
+- **销售流程**: 线索 → 机会 → 报价 → 成交 → 回款
+- **任务流程**: 创建 → 分配 → 执行 → 完成 → 评估
+
+## 性能优化规范
+
+### 前端优化
+- **虚拟滚动**: 大数据量表格使用虚拟滚动
+- **分页加载**: 合理设置分页大小，支持无限滚动
+- **图片懒加载**: 客户头像、附件预览等使用懒加载
+- **组件懒加载**: 路由级别的组件懒加载
+
+### 数据优化
+- **接口缓存**: 使用适当的缓存策略
+- **数据预加载**: 预加载用户常用的数据
+- **增量更新**: 支持数据的增量更新
+- **离线支持**: 关键功能支持离线操作
+
+## 导入顺序规范
+
+```typescript
+// 1. Vue相关
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+
+// 2. 第三方库
+import { ElMessage, ElMessageBox } from 'element-plus'
+import * as echarts from 'echarts'
+
+// 3. 工具函数
+import { formatDate, formatCurrency } from '@/utils/format'
+import { validateEmail, validatePhone } from '@/utils/validate'
+
+// 4. 状态管理
+import { useCustomerStore } from '@/stores/customer'
+import { useUserStore } from '@/stores/user'
+
+// 5. API接口
+import { getCustomerList, createCustomer } from '@/api/customer'
+
+// 6. 组件
+import CustomerCard from '@/components/customer/CustomerCard.vue'
+import DataTable from '@/components/common/DataTable.vue'
+
+// 7. 类型定义
+import type { Customer, CustomerQuery } from '@/types/customer'
+```
+
+## 测试规范
+
+### 单元测试
+- **组件测试**: 使用 Vitest + Vue Test Utils
+- **工具函数测试**: 覆盖所有工具函数
+- **Store测试**: 测试状态管理逻辑
+- **API测试**: Mock API响应进行测试
+
+### E2E测试
+- **关键业务流程**: 客户创建、机会管理、任务分配等
+- **权限测试**: 不同角色的权限验证
+- **数据流测试**: 完整的数据流程测试
+
+## 安全规范
+
+### 前端安全
+- **XSS防护**: 对用户输入进行转义
+- **CSRF防护**: 使用CSRF Token
+- **敏感信息**: 不在前端存储敏感信息
+- **权限验证**: 前端路由权限验证
+
+### 数据安全
+- **数据加密**: 敏感数据传输加密
+- **访问日志**: 记录数据访问日志
+- **数据备份**: 定期数据备份
+- **隐私保护**: 遵循数据隐私法规
+
+## 开发注意事项
+
+### 代码质量
+- **TypeScript严格模式**: 启用严格类型检查，避免使用 `any`
+- **ESLint规则**: 遵循项目ESLint配置
+- **代码注释**: 复杂业务逻辑添加详细注释
+- **错误处理**: 完善的错误处理和用户提示
+
+### 用户体验
+- **加载状态**: 所有异步操作显示加载状态
+- **错误提示**: 友好的错误提示信息
+- **操作反馈**: 及时的操作成功/失败反馈
+- **响应式设计**: 支持移动端访问
+
+### 国际化支持
+- **多语言**: 支持中英文切换
+- **时区处理**: 正确处理不同时区
+- **货币格式**: 支持多种货币格式
+- **日期格式**: 本地化日期格式
+
+## 部署和运维
+
+### 环境配置
+- **开发环境**: 本地开发配置
+- **测试环境**: 测试环境配置
+- **生产环境**: 生产环境配置
+- **环境变量**: 敏感配置使用环境变量
+
+### 监控和日志
+- **错误监控**: 前端错误监控
+- **性能监控**: 页面性能监控
+- **用户行为**: 用户操作日志
+- **系统日志**: 系统运行日志
+
+这些规则将帮助AI更好地理解CRM系统的业务特点和技术要求，生成更符合CRM业务场景的代码。
